@@ -12,6 +12,9 @@ class Person(db.Model):
     def __repr__(self):
         return json.dumps({"id": self.id, "name": self.name, "student": self.student})
 
+    def as_dict(self):
+        return {"id": self.id, "name": self.name, "student": self.student}
+
     @classmethod
     def find(cls, id):
         current_person = cls.query.filter_by(id=id).first()

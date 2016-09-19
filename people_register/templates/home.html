@@ -2,5 +2,52 @@
 
 {% block body %}
 
+  <div id="search" class="row">
+    <div class="col-md-8 col-md-offset-2">
+
+      <form>
+        <div class="form-group">
+          <label for="inputName">Search</label>
+          <input type="text" class="form-control" id="inputName" placeholder="Name">
+        </div>
+      </form>
+
+    </div>
+  </div>
+  <hr>
+  <div id="search" class="row">
+    <div id="person" class="col-md-8 col-md-offset-2">
+
+
+    </div>
+  </div>
+  <div class="row">
+    <div id="todays-register"class="col-md-8 col-md-offset-2">
+
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+
+  $(document).ready(function() {
+
+    $('#inputName').on('input', function() {
+
+      var $person = $('#person');
+      if ( $person.length ){
+
+        $.getJSON( "/people/search?name=Bo", function(data) {
+
+              alert(data.people)
+
+            })
+
+      }
+
+    })
+
+  });
 
 {% endblock %}

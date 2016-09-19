@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+
+      <table class="table">
+      <thead>
+          <tr><th> Name </th></tr>
+      </thead>
+      <tbody>
+
+        {% for person in people %}
+
+          <tr><td> {{ person.name }} </td></tr>
+
+        {% endfor %}
+
+      </tbody>
+      </table>
+
+    </div>
+  </div>
+
+{% endblock %}

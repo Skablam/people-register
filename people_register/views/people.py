@@ -1,4 +1,4 @@
-from flask import request, Blueprint, Response
+from flask import request, Blueprint, Response, request
 from flask import current_app
 from people_register.models import Person
 from people_register.extensions import db
@@ -18,6 +18,21 @@ def add_person():
     db.session.commit()
 
     return Response(status=201)
+
+@people.route("/search")
+def search_for_person():
+
+    search_name = request.args.get("name")
+
+    people = Person.query.filter(Person.name.like("%{0}%".format(search_name))).all()
+
+    people_list = []
+    for person in people:
+        people_list.append(person.as_dict())
+
+    search_response = json.dumps({"people" : people_list})
+
+    return Response(response=search_response, mimetype="application/json", status=200)
 
 @people.route('/<person_reference>', methods=['GET', 'PUT', 'DELETE'])
 def get_people(person_reference):
