@@ -16,7 +16,18 @@ COMMIT = os.getenv('COMMIT')
 # each app in the cluster will have a unique name.
 APP_NAME = os.getenv('APP_NAME')
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///peopleregister.db'
+SQL_HOST = os.environ['SQL_HOST']
+SQL_DATABASE = os.environ['SQL_DATABASE']
+SQL_PASSWORD = os.environ['SQL_PASSWORD']
+APP_SQL_USERNAME = os.environ['APP_SQL_USERNAME']
+ALEMBIC_SQL_USERNAME = os.environ['ALEMBIC_SQL_USERNAME']
+
+if os.getenv('SQL_USE_ALEMBIC_USER') == 'yes':
+    FINAL_SQL_USERNAME = ALEMBIC_SQL_USERNAME
+else:
+    FINAL_SQL_USERNAME = APP_SQL_USERNAME
+
+SQLALCHEMY_DATABASE_URI = 'postgres://{0}:{1}@{2}/{3}'.format(FINAL_SQL_USERNAME, SQL_PASSWORD, SQL_HOST, SQL_DATABASE)
 SQLALCHEMY_TRACK_MODIFICATIONS = False  # Explicitly set this in order to remove warning on run
 
 LOGCONFIG = {

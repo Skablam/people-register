@@ -1,4 +1,4 @@
-from flask import request, Blueprint, Response, request
+from flask import request, Blueprint, Response, request, render_template
 from flask import current_app
 from people_register.models import Person
 from people_register.extensions import db
@@ -8,16 +8,20 @@ import json
 people = Blueprint('people', __name__)
 
 
-@people.route("", methods=["POST"])
+@people.route("", methods=["GET", "POST"])
 def add_person():
+    if request.method == "GET":
+        people = Person.query.filter_by()
 
-    new_person = Person()
-    new_person.name = request.form.get("name")
+        return render_template("people.html", people=people)
+    elif request.method == "POST":
+        new_person = Person()
+        new_person.name = request.form.get("name")
 
-    db.session.add(new_person)
-    db.session.commit()
+        db.session.add(new_person)
+        db.session.commit()
 
-    return Response(status=201)
+        return Response(status=201)
 
 @people.route("/search")
 def search_for_person():

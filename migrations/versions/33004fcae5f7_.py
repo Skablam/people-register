@@ -10,8 +10,9 @@ Create Date: 2016-09-11 16:11:16.583472
 revision = '33004fcae5f7'
 down_revision = None
 
-from alembic import op
+from alembic import op, context
 import sqlalchemy as sa
+from flask import current_app
 
 
 def upgrade():
@@ -30,6 +31,13 @@ def upgrade():
     sa.ForeignKeyConstraint(['person_id'], ['person.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
+    # MANUALLY ADDED the line below to grant permissions for the user found in config variable APP_SQL_USERNAME on table person.
+    context.execute("GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE person TO " + current_app.config.get('APP_SQL_USERNAME'))
+    context.execute("GRANT USAGE, SELECT ON SEQUENCE person_id_seq TO " + current_app.config.get('APP_SQL_USERNAME'))
+
+    context.execute("GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE payment TO " + current_app.config.get('APP_SQL_USERNAME'))
+    context.execute("GRANT USAGE, SELECT ON SEQUENCE payment_id_seq TO " + current_app.config.get('APP_SQL_USERNAME'))
     ### end Alembic commands ###
 
 

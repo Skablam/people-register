@@ -30,6 +30,14 @@ To see what other commands are available run:
 python manage.py --help
 ```
 
+## Useful Curls
+
+Add a person
+```
+curl -X POST -F name="Barry Smith" localhost:6789/people
+curl -X POST -F name="Jenny Jones" localhost:6789/people
+curl -X POST -F name="Bob Barley" localhost:6789/people
+```
 
 ## Migrating existing apps
 

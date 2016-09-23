@@ -14,39 +14,79 @@
 
     </div>
   </div>
-  <hr>
-  <div id="search" class="row">
+
+  <div id="search-results" class="row">
     <div id="person" class="col-md-8 col-md-offset-2">
 
 
     </div>
   </div>
-  <div class="row">
-    <div id="todays-register"class="col-md-8 col-md-offset-2">
 
+  <hr>
+
+  <div class="row">
+    <div id="todays-register" class="col-md-8 col-md-offset-2">
+
+      <h3>Today's Register</h3>
+
+      <table class="table">
+      <thead>
+          <tr><th> Name </th></tr>
+      </thead>
+      <tbody>
+
+        {% for person in people %}
+
+          <tr><td> {{ person.name }} </td></tr>
+
+        {% endfor %}
+
+      </tbody>
+      </table>
 
     </div>
   </div>
+
 {% endblock %}
 
 {% block js %}
 
   $(document).ready(function() {
 
+    $.getJSON( "/events/today", function(data) {
+
+      $event_id = data["id"];
+
+    })
+
     $('#inputName').on('input', function() {
 
+      var search_name = $('#inputName').val();
       var $person = $('#person');
-      if ( $person.length ){
 
-        $.getJSON( "/people/search?name=Bo", function(data) {
+      // Empty out the person div every time a character is typed
+      $person.empty();
 
-              alert(data.people)
+      // If the search_name is not empty do an ajax call to get the potential names
+      if (search_name != '') {
+
+        //Do ajax call
+        $.getJSON( "/people/search?name=" + search_name, function(data) {
+
+              people = data["people"];
+
+              var arrayLength = people.length;
+              for (var i = 0; i < arrayLength; i++) {
+                  $person.append("<div class='search-person'><form action='/events/" +
+                    $event_id + "/register'><input type='text' name='fullname' value='" +
+                    people[i].name + "' readonly><input type='submit' value='Add to today&apos;s attendees'></form></div>")
+              }
 
             })
 
       }
 
-    })
+    }) //end of inputName of search
 
   });
 
