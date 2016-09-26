@@ -46,7 +46,7 @@ def runserver(port=9998):
     os.environ["LOG_LEVEL"] = "DEBUG"
     os.environ["COMMIT"] = "LOCAL"
 
-    app.run(debug=True, port=int(port))
+    app.run(debug=True, port=int(port), host="0.0.0.0")
 
 if __name__ == "__main__":
     manager.run()

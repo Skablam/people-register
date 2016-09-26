@@ -2,24 +2,29 @@ from people_register.extensions import db
 import json
 
 
-register = db.Table('register',
-    db.Column('person_id', db.Integer, db.ForeignKey('person.id')),
-    db.Column('event_id', db.Integer, db.ForeignKey('event.id'))
-)
+class Entry(db.Model):
+    __tablename__ = 'entry'
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), primary_key=True)
+    level = db.Column(db.String)
+    person = db.relationship("Person", back_populates="events")
+    event = db.relationship("Event", back_populates="entries")
 
 class Person(db.Model):
     __tablename__ = 'person'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     student = db.Column(db.Boolean)
+    member = db.Column(db.Boolean)
+    member_timestamp = db.Column(db.DateTime)
     payment = db.relationship("Payment", back_populates="person")
-    events = db.relationship("Event", secondary=register, back_populates="people")
+    events = db.relationship("Entry", back_populates="person")
 
     def __repr__(self):
         return json.dumps({"id": self.id, "name": self.name, "student": self.student})
 
     def as_dict(self):
-        return {"id": self.id, "name": self.name, "student": self.student}
+        return {"id": self.id, "name": self.name, "member": self.member}
 
     @classmethod
     def find(cls, id):
@@ -48,7 +53,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     name = db.Column(db.String)
-    people = db.relationship("Person", secondary=register, back_populates="events")
+    entries = db.relationship("Entry", back_populates="event")
 
     def __repr__(self):
         return json.dumps({"id": self.id, "name": self.name, "date": self.date.strftime("%Y-%m-%d")})
@@ -62,3 +67,21 @@ class Event(db.Model):
     def find_by_date(cls, date):
         current_event = cls.query.filter_by(date=date).first()
         return current_event
+
+    @classmethod
+    def find_by_date_and_name(cls, date, name):
+        current_event = cls.query.filter_by(name=name, date=date).first()
+        if current_event is not None:
+            return False, current_event
+        else:
+            current_event = cls.create_event(date, name)
+            db.session.add(current_event)
+            db.session.commit()
+            return True, current_event
+
+    @classmethod
+    def create_event(cls, date, name):
+        new_event = Event()
+        new_event.date = date
+        new_event.name = name
+        return new_event

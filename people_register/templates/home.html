@@ -3,42 +3,40 @@
 {% block body %}
 
   <div id="search" class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-6">
 
+      <h3>Search</h3>
       <form>
         <div class="form-group">
-          <label for="inputName">Search</label>
           <input type="text" class="form-control" id="inputName" placeholder="Name">
         </div>
       </form>
 
+      <div id="search-results">
+        <div id="person">
+
+
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div id="search-results" class="row">
-    <div id="person" class="col-md-8 col-md-offset-2">
-
-
-    </div>
-  </div>
-
-  <hr>
-
-  <div class="row">
-    <div id="todays-register" class="col-md-8 col-md-offset-2">
+    <div id="todays-register" class="col-md-4 col-md-offset-1">
 
       <h3>Today's Register</h3>
 
       <table class="table">
       <thead>
-          <tr><th> Name </th></tr>
+          <tr><th> Name </th><th> Level </th><th> Member </th></tr>
       </thead>
       <tbody>
 
-        {% for person in people %}
+        {% for entry in entries %}
 
-          <tr><td> {{ person.name }} </td></tr>
-
+          {% if entry.person.member == True %}
+            <tr class="highlight"><td> {{ entry.person.name }} </td><td> {{ entry.level }} </td><td> {{ entry.person.member }} </td></tr>
+          {% else %}
+            <tr><td> {{ entry.person.name }} </td><td> {{ entry.level }} </td><td> {{ entry.person.member }} </td></tr>
+          {% endif %}
         {% endfor %}
 
       </tbody>
@@ -53,11 +51,22 @@
 
   $(document).ready(function() {
 
-    $.getJSON( "/events/today", function(data) {
+    $.getJSON( '/events/today', function(data) {
 
-      $event_id = data["id"];
+      event_id = data["id"];
+      console.log("Event ID is " + event_id);
 
     })
+      .done(function() {
+        //
+      })
+      .fail(function() {
+        console.log("Error");
+      })
+      .error(function(jqXHR, textStatus, errorThrown) {
+        console.log("Error " + textStatus);
+        console.log("Incoming Text " + jqXHR.responseText);
+      });
 
     $('#inputName').on('input', function() {
 
@@ -70,6 +79,8 @@
       // If the search_name is not empty do an ajax call to get the potential names
       if (search_name != '') {
 
+        console.log("Get names that match search");
+
         //Do ajax call
         $.getJSON( "/people/search?name=" + search_name, function(data) {
 
@@ -77,16 +88,44 @@
 
               var arrayLength = people.length;
               for (var i = 0; i < arrayLength; i++) {
-                  $person.append("<div class='search-person'><form action='/events/" +
-                    $event_id + "/register'><input type='text' name='fullname' value='" +
-                    people[i].name + "' readonly><input type='submit' value='Add to today&apos;s attendees'></form></div>")
+                console.log(people[i].member)
+                if (people[i].member == true) {
+                    persondetails_class = "persondetails highlight"
+                    persondetails_checked = "checked"
+                } else {
+                    persondetails_class = "persondetails"
+                    persondetails_checked = ""
+                }
+
+                $person.append("<div id='persondetails' class='" + persondetails_class + "'><form class='form-inline' action='/events/" +
+                  event_id + "/register'><div class='form-group'><input class='form-control addmargin' type='text' name='fullname' value='" + people[i].name + "' readonly></div>" +
+                  "<select class='form-control addmargin' name='level'><option>Select Level...</option><option>Level 1</option><option>Level 2</option><option>Social Only</option></select>" +
+                  "<div class='checkbox addmargin'><label><input class='member' type='checkbox' name='member' id='member' value='true' " + persondetails_checked + "> Member</label></div>" +
+                  "<input class='btn btn-primary btn-sm add' type='submit' value='Add'></form></div>")
               }
+
+              // Add person as if they are new
+              $person.append("<div id='persondetails' class='persondetails'><form class='form-inline' action='/events/" +
+                event_id + "/register'><div class='form-group'><input class='form-control addmargin' type='text' name='fullname' value='" + search_name + "' readonly></div>" +
+                "<select class='form-control addmargin' name='level'><option>Select Level...</option><option>Level 1</option><option>Level 2</option><option>Social Only</option></select>" +
+                "<div class='checkbox addmargin'><label><input class='member' type='checkbox' name='member' id='member' value='true'> Member</label></div>" +
+                "<input class='btn btn-primary btn-sm add' type='submit' value='Add'></form></div>")
 
             })
 
       }
 
     }) //end of inputName of search
+
+    $('#person').on('click', '.member', function(){
+
+      if ($(this).is(':checked')) {
+          $(this).closest('#persondetails').addClass("highlight");
+
+      } else {
+          $(this).closest('#persondetails').removeClass("highlight");
+      }
+    });
 
   });
 

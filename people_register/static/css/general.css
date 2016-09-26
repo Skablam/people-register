@@ -1,0 +1,21 @@
+.addmargin {
+    margin: 5px;
+}
+
+.highlight {
+  background-color: #99BCC1;
+}
+
+.persondetails {
+  border-style: solid;
+  border-color: #ddd;
+  border-width: 1px;
+  border-radius: 4px 4px 0 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.add {
+  float: right;
+  margin: 7px
+}

@@ -11,8 +11,8 @@ register = Blueprint('register', __name__)
 @register.route("/")
 @register.route("/home")
 def home():
-    current_date = time.strftime("%Y-%m-%d")
+    headers = {"cache-control": "no-store"}
 
-    current_event = Event.find_by_date(current_date)
+    newly_created, current_event = Event.find_by_date_and_name(time.strftime("%Y-%m-%d"), "Weekly Classes")
 
-    return render_template("home.html", people=current_event.people)
+    return render_template("home.html", entries=current_event.entries, headers=headers)
